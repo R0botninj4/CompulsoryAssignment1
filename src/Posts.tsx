@@ -18,19 +18,6 @@ export function ListPosts() {
         setPosts(filteredArray)
     }
 
-    function renameProduct(id: number, newTitle: string) {
-        setPosts(posts.map(p =>
-            p.id === id ? {...p, title: newTitle} : p
-        ));
-    }
-
-    function seeProduct(id: number) {
-        const duplicate = [...posts];
-        const filteredArray = duplicate.filter(p => p.id == id)
-        setPosts(filteredArray)
-    }
-
-
     return <div>
         {
             posts.map(p => {
