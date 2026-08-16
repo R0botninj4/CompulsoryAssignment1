@@ -3,6 +3,8 @@ import {useEffect, useState} from "react";
 export function ListPosts() {
 
     const [posts, setPosts] = useState<Post[]>([])
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         fetch('https://dummyjson.com/posts')
@@ -18,33 +20,54 @@ export function ListPosts() {
         setPosts(filteredArray)
     }
 
-    return <div>
-        {
-            posts.map(p => {
-                return <div>
-                    <MyChildComponent key={p.id} post={p}
-                                      removePost={removePost}
-
-                    />
-                </div>
-
-
-            })
-        }
-    </div>;
+    return (
+        <div>
+            {posts.map((post) => (
+                <MyChildComponent
+                    key={post.id}
+                    post={post}
+                    removePost={removePost}
+                />
+            ))}
+        </div>
+    );
 }
 
 interface MyChildComponentProps {
-    post: Post,
-    removePost: (id: number) => void
+    post: Post;
+    removePost: (id: number) => void;
 }
 
-function MyChildComponent({post, removePost,}: MyChildComponentProps) {
+function MyChildComponent({
+    post,
+    removePost,
+}: MyChildComponentProps) {
+    return (
+        <div
+            style={{
+                marginBottom: "50px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                gap: "10px",
+            }}
+        >
+            <img
+                src={`https://dummyjson.com/image/300x150?text=Post+${post.id}`}
+                alt={post.title}
+            />
 
+            <h2 style={{ margin: 0 }}>
+                {post.title}
+            </h2>
 
-    return <div>the product is: {post?.title} <button onClick={() => removePost(post.id)}>delete this stuff</button></div>
-
+            <button onClick={() => removePost(post.id)}>
+                Delete post
+            </button>
+        </div>
+    );
 }
+
 
 
 export interface Root {
