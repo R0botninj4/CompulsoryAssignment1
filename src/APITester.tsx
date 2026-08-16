@@ -33,7 +33,7 @@ export function APITester() {
 
     const json = await response.json();
     setResponseFromServer(json);
-    navigate("/products");
+    navigate("/posts");
   }
 
   return (

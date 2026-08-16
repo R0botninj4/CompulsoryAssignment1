@@ -8,7 +8,7 @@ export function ListPosts() {
         fetch('https://dummyjson.com/posts')
             .then(res => res.json())
             .then((json) => {
-                setPosts(json.products)
+                setPosts(json.posts)
             });
     }, []);
 
