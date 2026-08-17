@@ -6,7 +6,9 @@ export function ListPosts() {
     const [posts, setPosts] = useState<Post[]>([]);
     const [images, setImages] = useState<DanbooruImage[]>([]);
     const [visiblePosts, setVisiblePosts] = useState(5);
-    const [search, setSearch] = useState('');
+    const [search, setSearch] = useState("");
+
+    const apiSearch = " kitagawa_marin";
 
     useEffect(() => {
         fetch('https://dummyjson.com/posts')
@@ -16,8 +18,10 @@ export function ListPosts() {
             });
     }, []);
 
+ // https://danbooru.donmai.us/posts  // for api
     useEffect(() => {
-        fetch('https://danbooru.donmai.us/posts.json?tags=kitagawa_marin+rating%3Ageneral+filetype%3Ajpg&limit=30')
+        fetch(`https://danbooru.donmai.us/posts.json?tags=${encodeURIComponent(apiSearch)}+rating%3Ageneral+filetype%3Ajpg&limit=30`) //sfw
+       // fetch(`https://danbooru.donmai.us/posts.json?tags=${encodeURIComponent(apiSearch)}+rating%3Aexplicit+filetype%3Ajpg&limit=30`) // nsfw
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`Danbooru svarede med status ${res.status}`);
