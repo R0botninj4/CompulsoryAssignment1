@@ -1,4 +1,5 @@
 import {useEffect, useState} from "react";
+import {Link} from "react-router-dom";
 
 export function ListPosts() {
 
@@ -75,7 +76,9 @@ function MyChildComponent({
                 />
             )}
 
-            <h2>{post.title}</h2>
+            <Link to={`/posts/${post.id}`}>
+                <h2>{post.title}</h2>
+            </Link>
 
             <button onClick={() => removePost(post.id)}>
                 Delete post
