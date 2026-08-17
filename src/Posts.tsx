@@ -66,6 +66,16 @@ function MyChildComponent({
                               image,
                               removePost,
                           }: MyChildComponentProps) {
+    const [comments, setComments] = useState<PostComment[]>([]);
+
+    useEffect(() => {
+        fetch(`https://dummyjson.com/posts/${post.id}/comments`)
+            .then(res => res.json())
+            .then((json) => {
+                setComments(json.comments);
+            });
+    }, [post.id]);
+
     return (
         <div style={{ marginBottom: "50px" }}>
             {image && (
@@ -80,6 +90,13 @@ function MyChildComponent({
                 <h2>{post.title}</h2>
             </Link>
 
+            {comments.map(comment => (
+                <div key={comment.id}>
+                    <strong>@{comment.user.username}</strong>
+                    <p>{comment.body}</p>
+                </div>
+            ))}
+
             <button onClick={() => removePost(post.id)}>
                 Delete post
             </button>
@@ -89,6 +106,18 @@ function MyChildComponent({
 
 interface Cat {
     id: string;
+}
+
+interface PostComment {
+    id: number;
+    body: string;
+    postId: number;
+    likes: number;
+    user: {
+        id: number;
+        username: string;
+        fullName: string;
+    };
 }
 
 export interface Root {
