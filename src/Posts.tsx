@@ -6,6 +6,7 @@ export function ListPosts() {
     const [posts, setPosts] = useState<Post[]>([]);
     const [images, setImages] = useState<DanbooruImage[]>([]);
     const [visiblePosts, setVisiblePosts] = useState(5);
+    const [search, setSearch] = useState('');
 
     useEffect(() => {
         fetch('https://dummyjson.com/posts')
@@ -38,9 +39,25 @@ export function ListPosts() {
         setPosts(filteredArray)
     }
 
+    const filteredPosts = posts.filter((post) =>
+        post.title.toLowerCase().includes(search.toLowerCase())
+    );
+
     return (
         <div>
-            {posts.slice(0, visiblePosts).map((post) => {
+            <div className="search-bar">
+                <input
+                    type="text"
+                    placeholder="Search posts..."
+                    value={search}
+                    onChange={(event) => {
+                        setSearch(event.target.value);
+                        setVisiblePosts(5);
+                    }}
+                />
+            </div>
+
+            {filteredPosts.slice(0, visiblePosts).map((post) => {
                 return (
                     <MyChildComponent
                         key={post.id}
@@ -51,7 +68,7 @@ export function ListPosts() {
                 );
             })}
 
-            {visiblePosts < posts.length && (
+            {visiblePosts < filteredPosts.length && (
                 <button onClick={() => setVisiblePosts(visiblePosts + 5)}>
                     Load more
                 </button>

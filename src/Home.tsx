@@ -10,7 +10,7 @@ export function Home() {
     return (
         <div className="home-page">
             <button onClick={() => login()}>Login</button>
-            ---- To see products
+            ---- To see Posts
         </div>
     );
 }
