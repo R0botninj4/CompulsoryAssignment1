@@ -2,15 +2,31 @@ import {useEffect, useState} from "react";
 
 export function ListPosts() {
 
-    const [posts, setPosts] = useState<Post[]>([])
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const [posts, setPosts] = useState<Post[]>([]);
+    const [cats, setCats] = useState<Cat[]>([]);
 
     useEffect(() => {
         fetch('https://dummyjson.com/posts')
             .then(res => res.json())
             .then((json) => {
                 setPosts(json.posts)
+            });
+    }, []);
+
+    useEffect(() => {
+        fetch('https://cataas.com/api/cats?limit=30')
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`Cataas svarede med status ${res.status}`);
+                }
+
+                return res.json();
+            })
+            .then((json) => {
+                setCats(json);
+            })
+            .catch((error) => {
+                console.log('Kunne ikke hente katte:', error);
             });
     }, []);
 
@@ -22,10 +38,11 @@ export function ListPosts() {
 
     return (
         <div>
-            {posts.map((post) => (
+            {posts.map((post, index) => (
                 <MyChildComponent
                     key={post.id}
                     post={post}
+                    image={cats[index] ? `https://cataas.com/cat/${cats[index].id}` : ''}
                     removePost={removePost}
                 />
             ))}
@@ -35,23 +52,15 @@ export function ListPosts() {
 
 interface MyChildComponentProps {
     post: Post;
+    image: string;
     removePost: (id: number) => void;
 }
 
 function MyChildComponent({
                               post,
+                              image,
                               removePost,
                           }: MyChildComponentProps) {
-    const [image, setImage] = useState("");
-
-    useEffect(() => {
-        fetch("https://api.waifu.im/images?IncludedTags=marin-kitagawa&IsNsfw=False")  //her ændre du ipa til image lige nu er det en baddie
-            .then((res) => res.json())
-            .then((json) => {
-                setImage(json.items[0].url);
-            });
-    }, []);
-
     return (
         <div style={{ marginBottom: "50px" }}>
             {image && (
@@ -71,7 +80,9 @@ function MyChildComponent({
     );
 }
 
-
+interface Cat {
+    id: string;
+}
 
 export interface Root {
     posts: Post[]
