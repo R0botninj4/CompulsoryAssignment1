@@ -8,7 +8,7 @@ export function Home() {
     };
 
     return (
-        <div>
+        <div className="home-page">
             <button onClick={() => login()}>Login</button>
             ---- To see products
         </div>
