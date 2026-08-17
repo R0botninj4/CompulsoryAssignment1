@@ -39,27 +39,30 @@ interface MyChildComponentProps {
 }
 
 function MyChildComponent({
-    post,
-    removePost,
-}: MyChildComponentProps) {
-    return (
-        <div
-            style={{
-                marginBottom: "50px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-start",
-                gap: "10px",
-            }}
-        >
-            <img
-                src={`https://dummyjson.com/image/300x150?text=Post+${post.id}`}
-                alt={post.title}
-            />
+                              post,
+                              removePost,
+                          }: MyChildComponentProps) {
+    const [image, setImage] = useState("");
 
-            <h2 style={{ margin: 0 }}>
-                {post.title}
-            </h2>
+    useEffect(() => {
+        fetch("https://api.waifu.im/images?IncludedTags=marin-kitagawa&IsNsfw=False")  //her ændre du ipa til image lige nu er det en baddie
+            .then((res) => res.json())
+            .then((json) => {
+                setImage(json.items[0].url);
+            });
+    }, []);
+
+    return (
+        <div style={{ marginBottom: "50px" }}>
+            {image && (
+                <img
+                    src={image}
+                    alt={post.title}
+                    width="300"
+                />
+            )}
+
+            <h2>{post.title}</h2>
 
             <button onClick={() => removePost(post.id)}>
                 Delete post
