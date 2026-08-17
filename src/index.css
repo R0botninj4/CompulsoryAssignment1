@@ -41,3 +41,28 @@ button:disabled {
   opacity: 0.5;
   cursor: default;
 }
+
+.api-tester {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.api-tester input {
+  background: #16181c;
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 0.55rem 0.8rem;
+  color: #e7e9ea;
+}
+
+.home-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
