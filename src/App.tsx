@@ -7,7 +7,7 @@ import logo from "./logo.svg";
 import reactLogo from "./react.svg";
 import {Home} from "@/Home.tsx";
 import { Layout } from "./Layout";
-
+import { PostDetail } from "./PostDetail.tsx";
 import { ListPosts } from "./Posts.tsx";
 
 const myRoutes: RouteObject[] = [
@@ -17,6 +17,7 @@ const myRoutes: RouteObject[] = [
             { path: "/", element: <Home /> },
             { path: "/register", element: <APITester /> },
             { path: "/posts", element: <ListPosts /> },
+            { path: "/posts/:id", element: <PostDetail /> },
         ],
     },
 ]
