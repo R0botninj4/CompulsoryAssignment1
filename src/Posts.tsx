@@ -4,7 +4,8 @@ import {Link} from "react-router-dom";
 export function ListPosts() {
 
     const [posts, setPosts] = useState<Post[]>([]);
-    const [cats, setCats] = useState<Cat[]>([]);
+    const [images, setImages] = useState<DanbooruImage[]>([]);
+    const [visiblePosts, setVisiblePosts] = useState(5);
 
     useEffect(() => {
         fetch('https://dummyjson.com/posts')
@@ -15,19 +16,19 @@ export function ListPosts() {
     }, []);
 
     useEffect(() => {
-        fetch('https://cataas.com/api/cats?limit=30')
+        fetch('https://danbooru.donmai.us/posts.json?tags=kitagawa_marin+rating%3Ageneral+filetype%3Ajpg&limit=30')
             .then(res => {
                 if (!res.ok) {
-                    throw new Error(`Cataas svarede med status ${res.status}`);
+                    throw new Error(`Danbooru svarede med status ${res.status}`);
                 }
 
                 return res.json();
             })
             .then((json) => {
-                setCats(json);
+                setImages(json);
             })
             .catch((error) => {
-                console.log('Kunne ikke hente katte:', error);
+                console.log('Kunne ikke hente Marin-billeder:', error);
             });
     }, []);
 
@@ -39,18 +40,22 @@ export function ListPosts() {
 
     return (
         <div>
-            {posts.map((post) => {
-                const cat = cats[post.id - 1];
-
+            {posts.slice(0, visiblePosts).map((post) => {
                 return (
                     <MyChildComponent
                         key={post.id}
                         post={post}
-                        image={cat ? `https://cataas.com/cat/${cat.id}` : ''}
+                        image={images[post.id - 1]?.large_file_url ?? ''}
                         removePost={removePost}
                     />
                 );
             })}
+
+            {visiblePosts < posts.length && (
+                <button onClick={() => setVisiblePosts(visiblePosts + 5)}>
+                    Load more
+                </button>
+            )}
         </div>
     );
 }
@@ -73,6 +78,7 @@ function MyChildComponent({
                     src={image}
                     alt={post.title}
                     width="300"
+                    loading="lazy"
                 />
             )}
 
@@ -87,8 +93,9 @@ function MyChildComponent({
     );
 }
 
-interface Cat {
-    id: string;
+interface DanbooruImage {
+    id: number;
+    large_file_url: string;
 }
 
 export interface Root {
