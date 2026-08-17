@@ -38,14 +38,18 @@ export function ListPosts() {
 
     return (
         <div>
-            {posts.map((post, index) => (
-                <MyChildComponent
-                    key={post.id}
-                    post={post}
-                    image={cats[index] ? `https://cataas.com/cat/${cats[index].id}` : ''}
-                    removePost={removePost}
-                />
-            ))}
+            {posts.map((post) => {
+                const cat = cats[post.id - 1];
+
+                return (
+                    <MyChildComponent
+                        key={post.id}
+                        post={post}
+                        image={cat ? `https://cataas.com/cat/${cat.id}` : ''}
+                        removePost={removePost}
+                    />
+                );
+            })}
         </div>
     );
 }
