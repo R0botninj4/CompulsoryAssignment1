@@ -14,7 +14,7 @@ export function Layout() {
                 {isFeedPage && (
                     <>
                         <img src={logo} alt="Logo" className="sidebar-logo" />
-                        <button>Create post</button>
+                        <button className="create-post-button">Create post</button>
                     </>
                 )}
             </aside>

@@ -53,6 +53,15 @@ button {
   cursor: pointer;
 }
 
+.create-post-button {
+  background: #fff;
+  color: #000;
+}
+
+.create-post-button:hover {
+  background: #e6e6e6;
+}
+
 button:hover {
   background: #1a8cd8;
 }
