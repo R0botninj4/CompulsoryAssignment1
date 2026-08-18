@@ -3,7 +3,6 @@ import {APITester} from "./APITester";
 import "./index.css";
 import {createBrowserRouter, type RouteObject, RouterProvider} from "react-router-dom";
 
-import logo from "./logo.svg";
 import reactLogo from "./react.svg";
 import {Home} from "@/Home.tsx";
 import { Layout } from "./Layout";
