@@ -1,11 +1,11 @@
 import { Outlet, useLocation } from "react-router-dom";
 import logo from "./Ylogo.png";
-import { useState, type Dispatch, type SetStateAction } from "react";
+import { useState } from "react";
 
 export interface LayoutContext {
     search: string;
     showCreatePost: boolean;
-    setShowCreatePost: Dispatch<SetStateAction<boolean>>;
+    closeCreatePost: () => void;
 }
 
 
@@ -15,6 +15,14 @@ export function Layout() {
     const [search, setSearch] = useState("");
     const [showCreatePost, setShowCreatePost] = useState(false);
 
+    function openCreatePost() {
+        setShowCreatePost(true);
+    }
+
+    function closeCreatePost() {
+        setShowCreatePost(false);
+    }
+
     return (
         <div className="app-shell">
             <aside className="sidebar-left">
@@ -23,7 +31,7 @@ export function Layout() {
                         <img src={logo} alt="Logo" className="sidebar-logo" />
                         <button
                             className="create-post-button"
-                            onClick={() => setShowCreatePost(true)}
+                            onClick={openCreatePost}
                         >
                             Create post
                         </button>
@@ -32,7 +40,13 @@ export function Layout() {
             </aside>
 
             <main className="feed-column">
-                <Outlet context={{ search, showCreatePost, setShowCreatePost }} />
+                <Outlet
+                    context={{
+                        search,
+                        showCreatePost,
+                        closeCreatePost,
+                    }}
+                />
             </main>
 
             <aside className="sidebar-right">

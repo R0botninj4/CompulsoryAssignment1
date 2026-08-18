@@ -5,29 +5,27 @@ import type { LayoutContext } from "./Layout";
 
 
 export function ListPosts() {
-
     const [posts, setPosts] = useState<Post[]>([]);
     const [images, setImages] = useState<DanbooruImage[]>([]);
     const [visiblePosts, setVisiblePosts] = useState(5);
-    const { search, showCreatePost, setShowCreatePost } = useOutletContext<LayoutContext>();
     const [newTitle, setNewTitle] = useState("");
     const [newBody, setNewBody] = useState("");
     const [newImage, setNewImage] = useState("");
+    const { search, showCreatePost, closeCreatePost } =
+        useOutletContext<LayoutContext>();
 
-    const apiSearch = " kitagawa_marin";
+    const apiSearch = "kitagawa_marin";
 
     useEffect(() => {
         fetch('https://dummyjson.com/posts')
             .then(res => res.json())
             .then((json) => {
-                setPosts(json.posts)
+                setPosts(json.posts);
             });
     }, []);
 
- // https://danbooru.donmai.us/posts  // for api
     useEffect(() => {
-        fetch(`https://danbooru.donmai.us/posts.json?tags=${encodeURIComponent(apiSearch)}+rating%3Ageneral+filetype%3Ajpg&limit=30`) //sfw
-       // fetch(`https://danbooru.donmai.us/posts.json?tags=${encodeURIComponent(apiSearch)}+rating%3Aexplicit+filetype%3Ajpg&limit=30`) // nsfw
+        fetch(`https://danbooru.donmai.us/posts.json?tags=${apiSearch}+rating%3Ageneral+filetype%3Ajpg&limit=30`)
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`Danbooru svarede med status ${res.status}`);
@@ -44,9 +42,7 @@ export function ListPosts() {
     }, []);
 
     function removePost(id: number) {
-        const duplicate = [...posts];
-        const filteredArray = duplicate.filter(p => p.id != id)
-        setPosts(filteredArray)
+        setPosts(posts.filter(post => post.id !== id));
     }
 
     function createPost(event: FormEvent<HTMLFormElement>) {
@@ -62,20 +58,19 @@ export function ListPosts() {
             }),
         })
             .then(res => res.json())
-            .then((json) => {
+            .then(() => {
                 const createdPost: Post = {
-                    ...json,
+                    id: Date.now(),
+                    title: newTitle,
+                    body: newBody,
                     image: newImage,
-                    tags: json.tags ?? [],
-                    reactions: json.reactions ?? { likes: 0, dislikes: 0 },
-                    views: json.views ?? 0,
                 };
 
-                setPosts(currentPosts => [createdPost, ...currentPosts]);
+                setPosts([createdPost, ...posts]);
                 setNewTitle("");
                 setNewBody("");
                 setNewImage("");
-                setShowCreatePost(false);
+                closeCreatePost();
             })
             .catch(error => console.log('Kunne ikke oprette posten:', error));
     }
@@ -92,7 +87,7 @@ export function ListPosts() {
                         <button
                             type="button"
                             className="close-modal-button"
-                            onClick={() => setShowCreatePost(false)}
+                            onClick={closeCreatePost}
                         >
                             ×
                         </button>
@@ -136,11 +131,14 @@ export function ListPosts() {
             )}
 
             {filteredPosts.slice(0, visiblePosts).map((post) => {
+                const image =
+                    post.image || images[post.id - 1]?.large_file_url || "";
+
                 return (
-                    <MyChildComponent
+                    <PostCard
                         key={post.id}
                         post={post}
-                        image={post.image ?? images[post.id - 1]?.large_file_url ?? ''}
+                        image={image}
                         removePost={removePost}
                     />
                 );
@@ -155,17 +153,13 @@ export function ListPosts() {
     );
 }
 
-interface MyChildComponentProps {
+interface PostCardProps {
     post: Post;
     image: string;
     removePost: (id: number) => void;
 }
 
-function MyChildComponent({
-                              post,
-                              image,
-                              removePost,
-                          }: MyChildComponentProps) {
+function PostCard({ post, image, removePost }: PostCardProps) {
     return (
         <div style={{ marginBottom: "50px" }}>
             {image && (
@@ -177,7 +171,10 @@ function MyChildComponent({
                 />
             )}
 
-            <Link to={`/posts/${post.id}`}>
+            <Link
+                to={`/posts/${post.id}`}
+                state={{ post: { ...post, image } }}
+            >
                 <h2>{post.title}</h2>
             </Link>
 
@@ -189,29 +186,12 @@ function MyChildComponent({
 }
 
 interface DanbooruImage {
-    id: number;
     large_file_url: string;
 }
 
-export interface Root {
-    posts: Post[]
-    total: number
-    skip: number
-    limit: number
-}
-
 export interface Post {
-    id: number
-    title: string
-    body: string
-    image?: string
-    tags: string[]
-    reactions: Reactions
-    views: number
-    userId: number
-}
-
-export interface Reactions {
-    likes: number
-    dislikes: number
+    id: number;
+    title: string;
+    body: string;
+    image?: string;
 }
