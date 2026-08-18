@@ -1,14 +1,18 @@
-import {useEffect, useState} from "react";
-import {Link} from "react-router-dom";
+import {useEffect, useState, type FormEvent} from "react";
 import { Link, useOutletContext } from "react-router-dom";
 import type { LayoutContext } from "./Layout";
+
+
 
 export function ListPosts() {
 
     const [posts, setPosts] = useState<Post[]>([]);
     const [images, setImages] = useState<DanbooruImage[]>([]);
     const [visiblePosts, setVisiblePosts] = useState(5);
-    const { search } = useOutletContext<LayoutContext>();
+    const { search, showCreatePost, setShowCreatePost } = useOutletContext<LayoutContext>();
+    const [newTitle, setNewTitle] = useState("");
+    const [newBody, setNewBody] = useState("");
+    const [newImage, setNewImage] = useState("");
 
     const apiSearch = " kitagawa_marin";
 
@@ -45,18 +49,98 @@ export function ListPosts() {
         setPosts(filteredArray)
     }
 
+    function createPost(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+
+        fetch('https://dummyjson.com/posts/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                title: newTitle,
+                body: newBody,
+                userId: 5,
+            }),
+        })
+            .then(res => res.json())
+            .then((json) => {
+                const createdPost: Post = {
+                    ...json,
+                    image: newImage,
+                    tags: json.tags ?? [],
+                    reactions: json.reactions ?? { likes: 0, dislikes: 0 },
+                    views: json.views ?? 0,
+                };
+
+                setPosts(currentPosts => [createdPost, ...currentPosts]);
+                setNewTitle("");
+                setNewBody("");
+                setNewImage("");
+                setShowCreatePost(false);
+            })
+            .catch(error => console.log('Kunne ikke oprette posten:', error));
+    }
+
     const filteredPosts = posts.filter((post) =>
         post.title.toLowerCase().includes(search.toLowerCase())
     );
 
     return (
         <div>
+            {showCreatePost && (
+                <div className="create-post-overlay">
+                    <form className="create-post-modal" onSubmit={createPost}>
+                        <button
+                            type="button"
+                            className="close-modal-button"
+                            onClick={() => setShowCreatePost(false)}
+                        >
+                            ×
+                        </button>
+
+                        <h2>Create post</h2>
+
+                        <input
+                            type="text"
+                            placeholder="Title"
+                            value={newTitle}
+                            onChange={(event) => setNewTitle(event.target.value)}
+                            required
+                        />
+
+                        <textarea
+                            placeholder="What is happening?"
+                            value={newBody}
+                            onChange={(event) => setNewBody(event.target.value)}
+                            required
+                        />
+
+                        <input
+                            type="url"
+                            placeholder="Image URL"
+                            value={newImage}
+                            onChange={(event) => setNewImage(event.target.value)}
+                            required
+                        />
+
+                        {newImage && (
+                            <img
+                                className="create-post-preview"
+                                src={newImage}
+                                alt="Preview"
+                            />
+                        )}
+
+                        <button type="submit">Post</button>
+                    </form>
+                </div>
+            )}
+
             {filteredPosts.slice(0, visiblePosts).map((post) => {
                 return (
                     <MyChildComponent
                         key={post.id}
                         post={post}
-                        image={images[post.id - 1]?.large_file_url ?? ''}
+                        image={post.image ?? images[post.id - 1]?.large_file_url ?? ''}
                         removePost={removePost}
                     />
                 );
@@ -120,6 +204,7 @@ export interface Post {
     id: number
     title: string
     body: string
+    image?: string
     tags: string[]
     reactions: Reactions
     views: number
