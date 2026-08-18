@@ -1,12 +1,14 @@
 import {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
+import { Link, useOutletContext } from "react-router-dom";
+import type { LayoutContext } from "./Layout";
 
 export function ListPosts() {
 
     const [posts, setPosts] = useState<Post[]>([]);
     const [images, setImages] = useState<DanbooruImage[]>([]);
     const [visiblePosts, setVisiblePosts] = useState(5);
-    const [search, setSearch] = useState("");
+    const { search } = useOutletContext<LayoutContext>();
 
     const apiSearch = " kitagawa_marin";
 
@@ -49,18 +51,6 @@ export function ListPosts() {
 
     return (
         <div>
-            <div className="search-bar">
-                <input
-                    type="text"
-                    placeholder="Search posts..."
-                    value={search}
-                    onChange={(event) => {
-                        setSearch(event.target.value);
-                        setVisiblePosts(5);
-                    }}
-                />
-            </div>
-
             {filteredPosts.slice(0, visiblePosts).map((post) => {
                 return (
                     <MyChildComponent
