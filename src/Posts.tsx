@@ -6,15 +6,13 @@ import type { LayoutContext } from "./Layout";
 
 export function ListPosts() {
     const [posts, setPosts] = useState<Post[]>([]);
-    const [images, setImages] = useState<DanbooruImage[]>([]);
+    const [images, setImages] = useState<CatImage[]>([]);
     const [visiblePosts, setVisiblePosts] = useState(5);
     const [newTitle, setNewTitle] = useState("");
     const [newBody, setNewBody] = useState("");
     const [newImage, setNewImage] = useState("");
     const { search, showCreatePost, closeCreatePost } =
         useOutletContext<LayoutContext>();
-
-    const apiSearch = "kitagawa_marin";
 
     useEffect(() => {
         fetch('https://dummyjson.com/posts')
@@ -25,10 +23,10 @@ export function ListPosts() {
     }, []);
 
     useEffect(() => {
-        fetch(`https://danbooru.donmai.us/posts.json?tags=${apiSearch}+rating%3Ageneral+filetype%3Ajpg&limit=30`)
+        fetch('https://cataas.com/api/cats?limit=30')
             .then(res => {
                 if (!res.ok) {
-                    throw new Error(`Danbooru svarede med status ${res.status}`);
+                    throw new Error(`Cataas svarede med status ${res.status}`);
                 }
 
                 return res.json();
@@ -37,7 +35,7 @@ export function ListPosts() {
                 setImages(json);
             })
             .catch((error) => {
-                console.log('Kunne ikke hente Marin-billeder:', error);
+                console.log('Kunne ikke hente kattebilleder:', error);
             });
     }, []);
 
@@ -131,8 +129,15 @@ export function ListPosts() {
             )}
 
             {filteredPosts.slice(0, visiblePosts).map((post) => {
-                const image =
-                    post.image || images[post.id - 1]?.large_file_url || "";
+                const cat = images.length > 0
+                    ? images[(post.id - 1) % images.length]
+                    : undefined;
+
+                const catImage = cat
+                    ? `https://cataas.com/cat/${cat.id}`
+                    : "";
+
+                const image = post.image || catImage;
 
                 return (
                     <PostCard
@@ -185,8 +190,8 @@ function PostCard({ post, image, removePost }: PostCardProps) {
     );
 }
 
-interface DanbooruImage {
-    large_file_url: string;
+interface CatImage {
+    id: string;
 }
 
 export interface Post {
