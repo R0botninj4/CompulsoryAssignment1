@@ -161,7 +161,7 @@ interface PostCardProps {
 
 function PostCard({ post, image, removePost }: PostCardProps) {
     return (
-        <div style={{ marginBottom: "50px" }}>
+        <div className="post-card">
             {image && (
                 <img
                     src={image}
